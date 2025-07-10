@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function ClientForm({ onBack }) {
-  const [rows, setRows] = useState([
-    { slNo: '', particulars: '', size: '', quantity: '', unit: '' }
-  ]);
-
-  const [formHeader] = useState({
+  const [header] = useState({
     type: 'C',
     requestNum: 'REQ-001',
     requestedBy: 'John Doe',
@@ -15,6 +11,10 @@ function ClientForm({ onBack }) {
     natureOfWork: 'Excavation',
     siteName: 'Site Alpha',
   });
+
+  const [rows, setRows] = useState([
+    { slNo: '', particulars: '', size: '', quantity: '', unit: '' },
+  ]);
 
   const handleRowChange = (index, field, value) => {
     const updated = [...rows];
@@ -34,14 +34,14 @@ function ClientForm({ onBack }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formHeader, items: rows };
+    const payload = { ...header, materials: rows };
 
     try {
       await axios.post('http://localhost:5000/api/submit-form', payload);
-      alert('✅ Submitted successfully!');
+      alert('✅ Form submitted successfully!');
     } catch (err) {
       console.error(err);
-      alert('❌ Failed to submit form.');
+      alert('❌ Submission failed.');
     }
   };
 
@@ -49,20 +49,38 @@ function ClientForm({ onBack }) {
     <div style={{ padding: '2rem' }}>
       <h2>📋 Client Material Request Form</h2>
 
-      {/* Show uneditable form headers */}
-      <div style={{ marginBottom: '1rem' }}>
-        <strong>TYPE:</strong> {formHeader.type} &nbsp; | &nbsp;
-        <strong>REQUEST NUM:</strong> {formHeader.requestNum} &nbsp; | &nbsp;
-        <strong>REQUESTED BY:</strong> {formHeader.requestedBy} <br />
-        <strong>WORK NUMBER:</strong> {formHeader.workNum} &nbsp; | &nbsp;
-        <strong>WORK SL.NO:</strong> {formHeader.workSlNo} &nbsp; | &nbsp;
-        <strong>NATURE OF WORK:</strong> {formHeader.natureOfWork} &nbsp; | &nbsp;
-        <strong>SITE NAME:</strong> {formHeader.siteName}
-      </div>
+      {/* Header Fields (non-editable) */}
+      <table border="1" cellPadding="8" style={{ width: '100%', marginBottom: '1rem', borderCollapse: 'collapse' }}>
+        <tbody>
+          <tr>
+            <td><strong>TYPE</strong></td>
+            <td><input value={header.type} readOnly /></td>
+            <td><strong>REQUEST NUM</strong></td>
+            <td><input value={header.requestNum} readOnly /></td>
+            <td><strong>REQUESTED BY</strong></td>
+            <td><input value={header.requestedBy} readOnly /></td>
+          </tr>
+          <tr>
+            <td><strong>WORK NUMBER</strong></td>
+            <td><input value={header.workNum} readOnly /></td>
+            <td><strong>WORK SL.NO</strong></td>
+            <td><input value={header.workSlNo} readOnly /></td>
+            <td><strong>SITE NAME</strong></td>
+            <td><input value={header.siteName} readOnly /></td>
+          </tr>
+          <tr>
+            <td><strong>NATURE OF WORK</strong></td>
+            <td colSpan="5">
+              <input value={header.natureOfWork} readOnly style={{ width: '100%' }} />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
+      {/* Editable Table Rows */}
       <form onSubmit={handleSubmit}>
         <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#eee', fontWeight: 'bold' }}>
+          <thead style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold' }}>
             <tr>
               <th>SL.NO</th>
               <th>PARTICULARS</th>
@@ -75,51 +93,14 @@ function ClientForm({ onBack }) {
           <tbody>
             {rows.map((row, idx) => (
               <tr key={idx}>
-                <td>
-                  <input
-                    type="text"
-                    value={row.slNo}
-                    onChange={(e) => handleRowChange(idx, 'slNo', e.target.value)}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.particulars}
-                    onChange={(e) => handleRowChange(idx, 'particulars', e.target.value)}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.size}
-                    onChange={(e) => handleRowChange(idx, 'size', e.target.value)}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.quantity}
-                    onChange={(e) => handleRowChange(idx, 'quantity', e.target.value)}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.unit}
-                    onChange={(e) => handleRowChange(idx, 'unit', e.target.value)}
-                    required
-                  />
-                </td>
+                <td><input value={row.slNo} onChange={(e) => handleRowChange(idx, 'slNo', e.target.value)} required /></td>
+                <td><input value={row.particulars} onChange={(e) => handleRowChange(idx, 'particulars', e.target.value)} required /></td>
+                <td><input value={row.size} onChange={(e) => handleRowChange(idx, 'size', e.target.value)} required /></td>
+                <td><input value={row.quantity} onChange={(e) => handleRowChange(idx, 'quantity', e.target.value)} required /></td>
+                <td><input value={row.unit} onChange={(e) => handleRowChange(idx, 'unit', e.target.value)} required /></td>
                 <td>
                   {rows.length > 1 && (
-                    <button type="button" onClick={() => removeRow(idx)}>
-                      ❌
-                    </button>
+                    <button type="button" onClick={() => removeRow(idx)}>❌</button>
                   )}
                 </td>
               </tr>
