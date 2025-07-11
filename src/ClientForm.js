@@ -2,136 +2,174 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function ClientForm({ onBack }) {
-  const [rows, setRows] = useState([
-    {
-      type: '',
-      requestNum: '',
-      requestedBy: '',
-      workNum: '',
-      workSlNo: '',
-      natureOfWork: '',
-      siteName: '',
-      slNo: '',
-      particulars: '',
-      size: '',
-      quantity: '',
-      unit: ''
-    }
-  ]);
+  const [basicInfo, setBasicInfo] = useState({
+    requestedBy: '',
+    workNumber: '',
+    natureOfWork: '',
+    siteName: '',
+  });
 
-  const handleChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index][field] = value;
-    setRows(updatedRows);
+  const [type, setType] = useState('');
+  const [materialRow, setMaterialRow] = useState({
+    workSlNo: '',
+    particulars: '',
+    size: '',
+    quantity: '',
+    unit: '',
+  });
+
+  const [vehicleRow, setVehicleRow] = useState({
+    requiredDate: '',
+    requiredTimeFrom: '',
+    requiredTimeTo: '',
+    requiredItem: '',
+  });
+
+  const handleBasicChange = (e) => {
+    setBasicInfo({ ...basicInfo, [e.target.name]: e.target.value });
   };
 
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        type: '',
-        requestNum: '',
-        requestedBy: '',
-        workNum: '',
-        workSlNo: '',
-        natureOfWork: '',
-        siteName: '',
-        slNo: '',
-        particulars: '',
-        size: '',
-        quantity: '',
-        unit: ''
-      }
-    ]);
+  const handleMaterialChange = (e) => {
+    setMaterialRow({ ...materialRow, [e.target.name]: e.target.value });
   };
 
-  const removeRow = (index) => {
-    const updated = [...rows];
-    updated.splice(index, 1);
-    setRows(updated);
+  const handleVehicleChange = (e) => {
+    setVehicleRow({ ...vehicleRow, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const finalData = {
+      ...basicInfo,
+      type,
+      details: type === 'vehicle' ? vehicleRow : materialRow,
+    };
+
     try {
-      await axios.post('http://localhost:5000/api/submit-form', { rows });
-      alert('✅ Submitted!');
+      await axios.post('http://localhost:5000/api/submit-form', finalData);
+      alert('✅ Form submitted successfully!');
     } catch (err) {
       console.error(err);
-      alert('❌ Submission failed');
+      alert('❌ Error submitting form.');
     }
-  };
-
-  const fieldStyle = {
-    width: '160px',
-    padding: '6px',
-    boxSizing: 'border-box'
   };
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>📋 Client Material Request Form</h2>
+      <h2>Client Form</h2>
 
-      <div
-        style={{
-          overflowX: 'scroll',
-          overflowY: 'hidden',
-          whiteSpace: 'nowrap',
-          border: '1px solid #ccc',
-          paddingBottom: '0.5rem'
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', minWidth: '1800px' }}>
-            <thead style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
-              <tr>
-                <th>TYPE</th>
-                <th>REQUEST NUM</th>
-                <th>REQUESTED BY</th>
-                <th>WORK NUMBER</th>
-                <th>WORK SL.NO</th>
-                <th>NATURE OF WORK</th>
-                <th>SITE NAME</th>
-                <th>SL.NO</th>
-                <th>PARTICULARS</th>
-                <th>SIZE</th>
-                <th>QUANTITY</th>
-                <th>UNIT</th>
-                <th>🗑️</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, idx) => (
-                <tr key={idx}>
-                  {Object.keys(row).map((field) => (
-                    <td key={field}>
-                      <input
-                        type="text"
-                        name={field}
-                        value={row[field]}
-                        onChange={(e) => handleChange(idx, field, e.target.value)}
-                        style={fieldStyle}
-                        required
-                      />
-                    </td>
-                  ))}
-                  <td>
-                    {rows.length > 1 && (
-                      <button type="button" onClick={() => removeRow(idx)}>❌</button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <form onSubmit={handleSubmit}>
+        {/* 🔵 Basic Info Row */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            overflowX: 'auto',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid #ccc',
+          }}
+        >
+          {['requestedBy', 'workNumber', 'natureOfWork', 'siteName'].map((field) => (
+            <input
+              key={field}
+              name={field}
+              placeholder={field.replace(/([A-Z])/g, ' $1')}
+              value={basicInfo[field]}
+              onChange={handleBasicChange}
+              required
+              style={{ minWidth: '200px' }}
+            />
+          ))}
+        </div>
 
-          <div style={{ marginTop: '1rem' }}>
-            <button type="button" onClick={addRow}>➕ Add Row</button>{' '}
-            <button type="submit">✅ Submit</button>{' '}
-            <button type="button" onClick={onBack}>⬅ Back</button>
+        {/* 🔵 Type Dropdown */}
+        <div style={{ marginTop: '1rem' }}>
+          <label><strong>Type:</strong>{' '}</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            required
+          >
+            <option value="">-- Select Type --</option>
+            <option value="materials">Materials</option>
+            <option value="consumables">Consumables</option>
+            <option value="vehicle">Vehicle</option>
+          </select>
+        </div>
+
+        {/* 🔵 Materials or Consumables */}
+        {(type === 'materials' || type === 'consumables') && (
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              marginTop: '1rem',
+              overflowX: 'auto',
+            }}
+          >
+            {['workSlNo', 'particulars', 'size', 'quantity', 'unit'].map((field) => (
+              <input
+                key={field}
+                name={field}
+                placeholder={field.replace(/([A-Z])/g, ' $1')}
+                value={materialRow[field]}
+                onChange={handleMaterialChange}
+                required
+                style={{ minWidth: '200px' }}
+              />
+            ))}
           </div>
-        </form>
-      </div>
+        )}
+
+        {/* 🔵 Vehicle */}
+        {type === 'vehicle' && (
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              marginTop: '1rem',
+              overflowX: 'auto',
+            }}
+          >
+            <input
+              type="date"
+              name="requiredDate"
+              value={vehicleRow.requiredDate}
+              onChange={handleVehicleChange}
+              required
+            />
+            <input
+              type="time"
+              name="requiredTimeFrom"
+              value={vehicleRow.requiredTimeFrom}
+              onChange={handleVehicleChange}
+              required
+            />
+            <input
+              type="time"
+              name="requiredTimeTo"
+              value={vehicleRow.requiredTimeTo}
+              onChange={handleVehicleChange}
+              required
+            />
+            <input
+              name="requiredItem"
+              placeholder="Required Item"
+              value={vehicleRow.requiredItem}
+              onChange={handleVehicleChange}
+              required
+              style={{ minWidth: '200px' }}
+            />
+          </div>
+        )}
+
+        {/* 🔵 Buttons */}
+        <div style={{ marginTop: '1.5rem' }}>
+          <button type="submit">✅ Submit</button>{' '}
+          <button type="button" onClick={onBack}>⬅️ Back</button>
+        </div>
+      </form>
     </div>
   );
 }
