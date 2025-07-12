@@ -29,8 +29,12 @@ function App() {
 const handleClientFormSubmit = (formData) => {
   setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
   setLogisticsData((prev) => [...prev, { ...formData }]); // send to logistics
-  alert('✅ Client form submitted!');
-  setCurrentModule(null);
+  
+  
+
+  alert('✅ Client form submitted! Sent to Logistics.');
+  setCurrentModule('logistics'); // ⬅️ Navigate to Logistics
+};
 };
 
   const handleAssignWorkNumber = (index, worknumber) => {
@@ -250,10 +254,10 @@ const handleClientFormSubmit = (formData) => {
           onApproveStatus={handleApprovalUpdate}
         />
       ) : currentModule === 'logistics' ? (
-       <Logistics
-  data={logisticsData}
-  onBack={() => setCurrentModule(null)}
-/>
+  <Logistics
+    data={logisticsData}
+    onBack={() => setCurrentModule(null)}
+  />
 
       ) : (
         <Dashboard onSelect={setCurrentModule} />
