@@ -11,7 +11,7 @@ import JobRegistry from './JobRegistry';
 import OperationHeadPanel from './OperationHeadPanel';
 import Systems from './Systems';
 import Accounts from './Accounts';
-import Logistics from './Logistics';
+import Logistics from './Logistics'; // ✅ Newly added component
 
 function App() {
   const [user, setUser] = useState(null);
@@ -78,7 +78,7 @@ function App() {
     );
   };
 
-  const handleApprovalUpdate = (worknumber, statusText) => {
+  const handleApprovalUpdate = (worknumber) => {
     setCorrespondenceData((prev) =>
       prev.map((entry) =>
         entry.worknumber === worknumber
@@ -137,7 +137,7 @@ function App() {
     if (uploadedFiles.length > 0) {
       const fileInfo = uploadedFiles.map((file) => ({
         name: file.name,
-        url: `http://localhost:5000/uploads/${file.name}`,
+        url: `https://alpha-flow-backend.onrender.com/uploads/${file.name}`,
       }));
 
       setSystemMessages((prev) => [
@@ -241,7 +241,7 @@ function App() {
           onBack={() => setCurrentModule(null)}
           onApproveStatus={handleApprovalUpdate}
         />
-      ) : currentModule === 'logistics' ? ( // ✅ ADD THIS BLOCK
+      ) : currentModule === 'logistics' ? (
         <Logistics
           onBack={() => setCurrentModule(null)}
         />
@@ -253,4 +253,3 @@ function App() {
 }
 
 export default App;
-
