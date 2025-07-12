@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
 function ClientForm({ onBack, onSubmit }) {
   const [header, setHeader] = useState({
@@ -45,23 +44,20 @@ function ClientForm({ onBack, onSubmit }) {
     setVehicleRow((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     const payload = {
       ...header,
-      data: header.type === 'vehicle' ? [vehicleRow] : materialRows,
+      items: header.type === 'vehicle' ? [vehicleRow] : materialRows,
     };
 
-    try {
-      await axios.post('https://alpha-flow-backend.onrender.com/api/submit-form', payload);
-      alert('✅ Submitted to backend successfully!');
 
-      if (onSubmit) onSubmit(payload); // ✅ Forward to logistics tab if needed
-    } catch (err) {
-      console.error(err);
-      alert('❌ Failed to submit');
+    if (onSubmit) {
+      onSubmit(payload); // Pass to App.js -> logisticsData
     }
+
+    alert('✅ Submitted to Logistics!');
   };
 
   return (
@@ -98,7 +94,7 @@ function ClientForm({ onBack, onSubmit }) {
       {['materials', 'consumables'].includes(header.type) && (
         <>
           <table border="1" cellPadding="8" style={{ width: '100%', minWidth: '800px', marginBottom: '1rem' }}>
-            <thead style={{ backgroundColor: '#f0f0f0' }}>
+            <thead>
               <tr>
                 <th>Work Sl.No</th>
                 <th>Particulars</th>
@@ -125,9 +121,7 @@ function ClientForm({ onBack, onSubmit }) {
             </tbody>
           </table>
 
-          <button type="button" onClick={addMaterialRow}>
-            ➕ Add Row
-          </button>
+          <button type="button" onClick={addMaterialRow}>➕ Add Row</button>
         </>
       )}
 
