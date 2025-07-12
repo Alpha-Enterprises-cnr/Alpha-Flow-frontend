@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Typography, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 
-function Logistics({ data = [], onBack }) {
+function Logistics({ items = [], onBack }) {
   return (
     <div style={{ padding: '2rem' }}>
       <Typography variant="h5" gutterBottom>
@@ -33,8 +33,8 @@ function Logistics({ data = [], onBack }) {
         </TableHead>
 
         <TableBody>
-          {data.map((entry, i) =>
-            entry.data.map((row, j) => (
+          {items.map((entry, i) =>
+            entry.items.map((row, j) => (
               <TableRow key={`${i}-${j}`}>
                 <TableCell>{entry.requestedBy}</TableCell>
                 <TableCell>{entry.workNumber}</TableCell>
