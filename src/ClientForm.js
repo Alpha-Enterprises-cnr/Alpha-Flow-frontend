@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function ClientForm({ onBack }) {
+function ClientForm({ onBack, onSubmit }) {
   const [header, setHeader] = useState({
     requestedBy: '',
     workNumber: '',
@@ -50,15 +50,14 @@ function ClientForm({ onBack }) {
 
     const payload = {
       ...header,
-      data:
-        header.type === 'vehicle'
-          ? [vehicleRow]
-          : materialRows,
+      data: header.type === 'vehicle' ? [vehicleRow] : materialRows,
     };
 
     try {
       await axios.post('https://alpha-flow-backend.onrender.com/api/submit-form', payload);
       alert('✅ Submitted to backend successfully!');
+
+      if (onSubmit) onSubmit(payload); // ✅ Forward to logistics tab if needed
     } catch (err) {
       console.error(err);
       alert('❌ Failed to submit');
@@ -66,43 +65,22 @@ function ClientForm({ onBack }) {
   };
 
   return (
-    <div style={{ padding: '2rem', overflowX: 'auto' }}>
+    <form onSubmit={handleSubmit} style={{ padding: '2rem', overflowX: 'auto' }}>
       <h2>Client Material Request Form</h2>
 
       {/* Header Row */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-        <input
-          type="text"
-          name="requestedBy"
-          placeholder="Requested By"
-          value={header.requestedBy}
-          onChange={handleHeaderChange}
-          required
-        />
-        <input
-          type="text"
-          name="workNumber"
-          placeholder="Work Number"
-          value={header.workNumber}
-          onChange={handleHeaderChange}
-          required
-        />
-        <input
-          type="text"
-          name="natureOfWork"
-          placeholder="Nature of Work"
-          value={header.natureOfWork}
-          onChange={handleHeaderChange}
-          required
-        />
-        <input
-          type="text"
-          name="siteName"
-          placeholder="Site Name"
-          value={header.siteName}
-          onChange={handleHeaderChange}
-          required
-        />
+        {['requestedBy', 'workNumber', 'natureOfWork', 'siteName'].map((field) => (
+          <input
+            key={field}
+            type="text"
+            name={field}
+            placeholder={field.replace(/([A-Z])/g, ' $1')}
+            value={header[field]}
+            onChange={handleHeaderChange}
+            required
+          />
+        ))}
       </div>
 
       {/* Dropdown */}
@@ -132,46 +110,16 @@ function ClientForm({ onBack }) {
             <tbody>
               {materialRows.map((row, idx) => (
                 <tr key={idx}>
-                  <td>
-                    <input
-                      type="text"
-                      name="workSlNo"
-                      value={row.workSlNo}
-                      onChange={(e) => handleMaterialChange(idx, e)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="particulars"
-                      value={row.particulars}
-                      onChange={(e) => handleMaterialChange(idx, e)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="size"
-                      value={row.size}
-                      onChange={(e) => handleMaterialChange(idx, e)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="qty"
-                      value={row.qty}
-                      onChange={(e) => handleMaterialChange(idx, e)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="units"
-                      value={row.units}
-                      onChange={(e) => handleMaterialChange(idx, e)}
-                    />
-                  </td>
+                  {['workSlNo', 'particulars', 'size', 'qty', 'units'].map((col) => (
+                    <td key={col}>
+                      <input
+                        type="text"
+                        name={col}
+                        value={row[col]}
+                        onChange={(e) => handleMaterialChange(idx, e)}
+                      />
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -216,10 +164,10 @@ function ClientForm({ onBack }) {
       )}
 
       <div style={{ marginTop: '1rem' }}>
-        <button type="submit" onClick={handleSubmit}>✅ Submit</button>
+        <button type="submit">✅ Submit</button>
         <button type="button" onClick={onBack} style={{ marginLeft: '1rem' }}>⬅️ Back</button>
       </div>
-    </div>
+    </form>
   );
 }
 
