@@ -28,11 +28,12 @@ function App() {
 
   // ✅ Client Form Submission
   const handleClientFormSubmit = (formData) => {
-    setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
-    setLogisticsData((prev) => [...prev, { ...formData }]); // send to logistics
-    alert('✅ Client form submitted! Sent to Logistics.');
-    setCurrentModule('logistics'); // ⬅️ Navigate to Logistics
-  };
+  setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
+  setLogisticsData((prev) => [...prev, { ...formData }]); // ✅ This formData now has .items
+  alert('✅ Client form submitted! Sent to Logistics.');
+  setCurrentModule('logistics');
+};
+
 
   const handleAssignWorkNumber = (index, worknumber) => {
     setCorrespondenceData((prev) => {
