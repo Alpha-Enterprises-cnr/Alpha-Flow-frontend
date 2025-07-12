@@ -24,18 +24,15 @@ function App() {
   const [systemMessages, setSystemMessages] = useState([]);
   const [accountsData, setAccountsData] = useState([]);
   const [systemsToOperationHead, setSystemsToOperationHead] = useState([]);
-  const [logisticsData, setLogisticsData] = useState([]);
+  const [logisticsData, setLogisticsData] = useState([]); // ✅ Logistics State
 
-const handleClientFormSubmit = (formData) => {
-  setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
-  setLogisticsData((prev) => [...prev, { ...formData }]); // send to logistics
-  
-  
-
-  alert('✅ Client form submitted! Sent to Logistics.');
-  setCurrentModule('logistics'); // ⬅️ Navigate to Logistics
-};
-};
+  // ✅ Client Form Submission
+  const handleClientFormSubmit = (formData) => {
+    setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
+    setLogisticsData((prev) => [...prev, { ...formData }]); // send to logistics
+    alert('✅ Client form submitted! Sent to Logistics.');
+    setCurrentModule('logistics'); // ⬅️ Navigate to Logistics
+  };
 
   const handleAssignWorkNumber = (index, worknumber) => {
     setCorrespondenceData((prev) => {
@@ -164,12 +161,6 @@ const handleClientFormSubmit = (formData) => {
     }
   };
 
-  const handleClientFormSubmit = (formData) => {
-    setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
-    alert('Client form submitted successfully!');
-    setCurrentModule(null);
-  };
-
   const handleJobRegistrySubmit = (formData) => {
     setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
     alert('Job registry submitted successfully!');
@@ -254,11 +245,10 @@ const handleClientFormSubmit = (formData) => {
           onApproveStatus={handleApprovalUpdate}
         />
       ) : currentModule === 'logistics' ? (
-  <Logistics
-    data={logisticsData}
-    onBack={() => setCurrentModule(null)}
-  />
-
+        <Logistics
+          data={logisticsData}
+          onBack={() => setCurrentModule(null)}
+        />
       ) : (
         <Dashboard onSelect={setCurrentModule} />
       )}
