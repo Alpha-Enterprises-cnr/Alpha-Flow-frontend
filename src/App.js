@@ -24,6 +24,14 @@ function App() {
   const [systemMessages, setSystemMessages] = useState([]);
   const [accountsData, setAccountsData] = useState([]);
   const [systemsToOperationHead, setSystemsToOperationHead] = useState([]);
+  const [logisticsData, setLogisticsData] = useState([]);
+
+const handleClientFormSubmit = (formData) => {
+  setCorrespondenceData((prev) => [...prev, { ...formData, approved: false }]);
+  setLogisticsData((prev) => [...prev, { ...formData }]); // send to logistics
+  alert('✅ Client form submitted!');
+  setCurrentModule(null);
+};
 
   const handleAssignWorkNumber = (index, worknumber) => {
     setCorrespondenceData((prev) => {
@@ -242,9 +250,11 @@ function App() {
           onApproveStatus={handleApprovalUpdate}
         />
       ) : currentModule === 'logistics' ? (
-        <Logistics
-          onBack={() => setCurrentModule(null)}
-        />
+       <Logistics
+  data={logisticsData}
+  onBack={() => setCurrentModule(null)}
+/>
+
       ) : (
         <Dashboard onSelect={setCurrentModule} />
       )}
