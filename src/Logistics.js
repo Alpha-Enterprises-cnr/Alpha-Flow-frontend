@@ -1,11 +1,39 @@
-import React from 'react';
-import { Button, Typography, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  Typography,
+  TextField,
+} from '@mui/material';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import SaveIcon from '@mui/icons-material/Save';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-function Logistics({ items = [], onBack }) {
+function Logistics({ data = [], onBack }) {
+  const [logisticsInputs, setLogisticsInputs] = useState({});
+
+  const handleInputChange = (i, j, field, value) => {
+    setLogisticsInputs((prev) => {
+      const key = `${i}-${j}`;
+      const row = prev[key] || {};
+      return { ...prev, [key]: { ...row, [field]: value } };
+    });
+  };
+
+  const handleSave = () => {
+    console.log('🚚 Saved logistics data:', logisticsInputs);
+    alert('✅ Logistics data saved (see console)');
+  };
+
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: '2rem', overflowX: 'auto' }}>
       <Typography variant="h5" gutterBottom>
-        🚛 Logistics Tracker
+        <LocalShippingIcon style={{ verticalAlign: 'middle', marginRight: '8px' }} />
+        Logistics Tracker
       </Typography>
 
       <Table>
@@ -20,7 +48,6 @@ function Logistics({ items = [], onBack }) {
             <TableCell>Size</TableCell>
             <TableCell>Qty</TableCell>
             <TableCell>Unit</TableCell>
-            {/* ➕ Add Additional Editable Fields Below */}
             <TableCell>Alt.Qty</TableCell>
             <TableCell>Alt.Unit</TableCell>
             <TableCell>From</TableCell>
@@ -33,41 +60,120 @@ function Logistics({ items = [], onBack }) {
         </TableHead>
 
         <TableBody>
-          {items.map((entry, i) =>
-            entry.items.map((row, j) => (
-              <TableRow key={`${i}-${j}`}>
-                <TableCell>{entry.requestedBy}</TableCell>
-                <TableCell>{entry.workNumber}</TableCell>
-                <TableCell>{entry.natureOfWork}</TableCell>
-                <TableCell>{entry.siteName}</TableCell>
+          {data.map((entry, i) =>
+            (entry.items || []).map((row, j) => {
+              const key = `${i}-${j}`;
+              const logisticsRow = logisticsInputs[key] || {};
+              return (
+                <TableRow key={key}>
+                  {/* Read-only client data */}
+                  <TableCell>{entry.requestedBy}</TableCell>
+                  <TableCell>{entry.workNumber}</TableCell>
+                  <TableCell>{entry.natureOfWork}</TableCell>
+                  <TableCell>{entry.siteName}</TableCell>
+                  <TableCell>{row.workSlNo}</TableCell>
+                  <TableCell>{row.particulars}</TableCell>
+                  <TableCell>{row.size}</TableCell>
+                  <TableCell>{row.qty}</TableCell>
+                  <TableCell>{row.units}</TableCell>
 
-                {/* These are from materialRows */}
-                <TableCell>{row.workSlNo}</TableCell>
-                <TableCell>{row.particulars}</TableCell>
-                <TableCell>{row.size}</TableCell>
-                <TableCell>{row.qty}</TableCell>
-                <TableCell>{row.units}</TableCell>
-
-                {/* Editable Fields for Logistician */}
-                <TableCell><input type="text" /></TableCell>
-                <TableCell><input type="text" /></TableCell>
-                <TableCell><input type="text" placeholder="From" /></TableCell>
-                <TableCell><input type="text" placeholder="To" /></TableCell>
-                <TableCell><input type="text" placeholder="Mode" /></TableCell>
-                <TableCell><input type="number" /></TableCell>
-                <TableCell><input type="number" /></TableCell>
-                <TableCell><input type="text" placeholder="Remark" /></TableCell>
-              </TableRow>
-            ))
+                  {/* Editable logistics data */}
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.altQty || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'altQty', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.altUnit || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'altUnit', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.from || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'from', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.to || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'to', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.transport || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'transport', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.costPrice || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'costPrice', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.cpTransport || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'cpTransport', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      value={logisticsRow.remark || ''}
+                      onChange={(e) =>
+                        handleInputChange(i, j, 'remark', e.target.value)
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>
 
       <div style={{ marginTop: '2rem' }}>
-        <Button variant="contained" color="success" startIcon={<span>💾</span>}>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<SaveIcon />}
+          onClick={handleSave}
+        >
           SAVE
         </Button>
-        <Button onClick={onBack} style={{ marginLeft: '1rem' }}>
+
+        <Button
+          variant="text"
+          color="primary"
+          onClick={onBack}
+          style={{ marginLeft: '1rem' }}
+          startIcon={<ArrowBackIcon />}
+        >
           BACK TO DASHBOARD
         </Button>
       </div>
